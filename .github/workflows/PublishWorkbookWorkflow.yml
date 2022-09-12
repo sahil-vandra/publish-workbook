@@ -26,4 +26,4 @@ jobs:
           python -m pip install --upgrade pip
 
       - name: Run unit tests
-        run: python3 hello.py
+        run: python3 publish_workbook.py --project_name "Technology" --password ${{env.PASS}} --workbook_files "Sales Growth Dashboard.twbx,Sample.twbx" 
