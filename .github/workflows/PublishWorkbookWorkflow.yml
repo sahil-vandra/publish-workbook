@@ -1,7 +1,7 @@
 name: PublishWorkbook
 on:
   push:
-    branches: [Master]
+    branches: [main]
 
 env:
     UNAME: ${{secrets.USERNAME}}
