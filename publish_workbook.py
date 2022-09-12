@@ -216,8 +216,8 @@ def main(args):
 
     ##### STEP 0: INITIALIZATION #####
     server = 'https://tableau.devinvh.com'
-    username = os.environ['USERNAME']
-    password = os.environ['PASSWORD']
+    username = 'Nirav.Padia'
+    password = args.password
 
     ##### STEP 1: SIGN IN #####
     print("\n1. Signing in as " + username)
@@ -330,9 +330,11 @@ if __name__ == '__main__':
                         type=str, required=True)
     parser.add_argument('--project_name', action='store',
                         type=str, required=True)
+    parser.add_argument('--password', action='store',
+                        type=str, required=True)
     args = parser.parse_args()
 
     main(args)
 
 
-# python3 publish_workbook.py --project_name "Technology" --workbook_files "/home/dev1003/twbx_files/Sales Growth Dashboard.twbx,/home/dev1003/twbx_files/InsideAirbnb.twbx,/home/dev1003/twbx_files/Sample.twbx"
+# python3 publish_workbook.py --project_name "Technology" --password 'pass' --workbook_files "/home/dev1003/twbx_files/Sales Growth Dashboard.twbx,/home/dev1003/twbx_files/InsideAirbnb.twbx,/home/dev1003/twbx_files/Sample.twbx" 
