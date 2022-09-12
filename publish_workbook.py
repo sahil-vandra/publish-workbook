@@ -207,12 +207,13 @@ def main(args):
     project_name = args.project_name
     print("\nargs ::", args.project_name)
     
-    workbook_file_path_list = args.workbook_files.split(",")
-    workbook_file_list = []
-    for i in workbook_file_path_list:
-        workbook_file_list.append(i.rsplit('/', 1)[1])
+    workbook_file_list = args.workbook_files.split(",")
+    # workbook_file_path_list = args.workbook_files.split(",")
+    # workbook_file_list = []
+    # for i in workbook_file_path_list:
+    #     workbook_file_list.append(i.rsplit('/', 1)[1])
     # print('\ntemp_list ::', workbook_file_path_list)
-    # print("\ntemp_list1 ::", workbook_file_list)
+    print("\ntemp_list1 ::", workbook_file_list)
 
     ##### STEP 0: INITIALIZATION #####
     server = 'https://tableau.devinvh.com'
@@ -228,16 +229,17 @@ def main(args):
     project_id = get_default_project_id(server, auth_token, site_id, project_name)
     print("\nproject_id ::", project_id)
 
-    for workbook_file_path,  workbook_file in zip(workbook_file_path_list, workbook_file_list):
-        print("\nworkbook_file_path ::", workbook_file_path)
+    # for workbook_file_path,  workbook_file in zip(workbook_file_path_list, workbook_file_list):
+    for workbook_file in workbook_file_list:
+        # print("\nworkbook_file_path ::", workbook_file_path)
         print("\nworkbook_file ::", workbook_file)
 
         print(
             "\n*Publishing '{0}' to the default project as {1}*".format(workbook_file, username))
 
-        if not os.path.isfile(workbook_file_path):
-            error = "{0}: file not found".format(workbook_file_path)
-            raise IOError(error)
+        # if not os.path.isfile(workbook_file_path):
+        #     error = "{0}: file not found".format(workbook_file_path)
+        #     raise IOError(error)
 
         # Break workbook file by name and extension
         workbook_filename, file_extension = workbook_file.split('.', 1)
@@ -247,7 +249,8 @@ def main(args):
             raise UserDefinedFieldError(error)
 
         # Get workbook size to check if chunking is necessary
-        workbook_size = os.path.getsize(workbook_file_path)
+        # workbook_size = os.path.getsize(workbook_file_path)
+        workbook_size = os.path.getsize(workbook_file)
         chunked = workbook_size >= FILESIZE_LIMIT
         # print("\nIs chunked??? ::", chunked)
 
@@ -271,7 +274,8 @@ def main(args):
                 "/api/3.15/sites/{0}/fileUploads/{1}".format(site_id, uploadID)
 
             # Read the contents of the file in chunks of 100KB
-            with open(workbook_file_path, 'rb') as f:
+            # with open(workbook_file_path, 'rb') as f:
+            with open(workbook_file, 'rb') as f:
                 while True:
                     data = f.read(CHUNK_SIZE)
                     if not data:
@@ -299,7 +303,8 @@ def main(args):
                   "' using the all-in-one method (workbook under 64MB)")
 
             # Read the contents of the file to publish
-            with open(workbook_file_path, 'rb') as f:
+            # with open(workbook_file_path, 'rb') as f:
+            with open(workbook_file, 'rb') as f:
                 workbook_bytes = f.read()
 
             # Finish building request for all-in-one method
