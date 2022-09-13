@@ -39,8 +39,8 @@ jobs:
         run: |
           if [ -z ${{ steps.get-files.outputs.files }} ]
           then
-                echo "\${{ steps.get-files.outputs.files }} is empty"
+                echo ${{ steps.get-files.outputs.files }}"
           else
-                echo "\"${{ steps.get-files.outputs.files }}" is NOT empty"
+                echo "${{ steps.get-files.outputs.files }}"
                 python3 publish_workbook.py --project_name "Technology" --password ${{env.PASS}} --workbook_files "${{ steps.get-files.outputs.files }}"
           fi
