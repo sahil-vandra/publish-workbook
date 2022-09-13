@@ -37,7 +37,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          if [ [ -n "${{ steps.get-files.outputs.files }}" ]  ]
+          if [ [ -n ${{ steps.get-files.outputs.files }} ]  ]
           then
                 echo "in if"
           else
