@@ -37,8 +37,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          if [ [ -n ${{ steps.get-files.outputs.files }} ]  ]
-          then
+          if [ ! "${{ steps.get-files.outputs.files }}" ];then
                 echo "in if"
           else
                 python3 publish_workbook.py --project_name "Technology" --password ${{env.PASS}} --workbook_files "${{ steps.get-files.outputs.files }}"
