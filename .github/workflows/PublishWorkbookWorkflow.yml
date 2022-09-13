@@ -37,7 +37,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          if [ -z ${{ steps.get-files.outputs.files }} ]
+          if [ [ ${{ steps.get-files.outputs.files }} -eq 0 ]  ]
           then
                 echo ${{ steps.get-files.outputs.files }}"
           else
