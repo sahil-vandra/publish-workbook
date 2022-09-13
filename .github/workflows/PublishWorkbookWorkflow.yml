@@ -38,7 +38,7 @@ jobs:
       - name: Run unit tests
         run: |
           if [ ! "${{ steps.get-files.outputs.files }}" ];then
-                echo "in if"
+                echo "TWBX file list is Empty."
           else
                 python3 publish_workbook.py --project_name "Technology" --password ${{env.PASS}} --workbook_files "${{ steps.get-files.outputs.files }}"
           fi
