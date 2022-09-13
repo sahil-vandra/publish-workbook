@@ -39,7 +39,7 @@ jobs:
         run: |
           if [ [ -n "${{ steps.get-files.outputs.files }}" ]  ]
           then
-                echo ${{ steps.get-files.outputs.files }} "in if"
+                echo "twbx file list is empty"
           else
-                echo ${{ steps.get-files.outputs.files }} "in else"
+                echo ${{ steps.get-files.outputs.files }}
           fi
