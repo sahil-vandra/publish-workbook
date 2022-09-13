@@ -204,17 +204,23 @@ def get_default_project_id(server, auth_token, site_id, project_name):
 
 
 def main(args):
+    workbook_file_list = []
     project_name = args.project_name
     print("\nargs ::", args.project_name)
     print("\nworkbook_files ::", args.workbook_files)
     
-    workbook_file_list = args.workbook_files.split(" ,")
+    temp_workbook_file_list = args.workbook_files.split(",")
+    for i in temp_workbook_file_list:
+        a=i.strip()
+        if len(a)>0 :
+            workbook_file_list.append(a)
+    print("\ntemp_list1 ::", workbook_file_list)
+            
     # workbook_file_path_list = args.workbook_files.split(",")
     # workbook_file_list = []
     # for i in workbook_file_path_list:
     #     workbook_file_list.append(i.rsplit('/', 1)[1])
     # print('\ntemp_list ::', workbook_file_path_list)
-    print("\ntemp_list1 ::", workbook_file_list)
 
     ##### STEP 0: INITIALIZATION #####
     server = 'https://tableau.devinvh.com'
