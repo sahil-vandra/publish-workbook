@@ -36,4 +36,12 @@ jobs:
         run: echo "${{ steps.get-files.outputs.files }}"
 
       - name: Run unit tests
-        run: python3 publish_workbook.py --project_name "Technology" --password ${{env.PASS}} --workbook_files "${{ steps.get-files.outputs.files }}"
+        run: |
+          if [ -z "${{ steps.get-files.outputs.files }}" ]
+          then
+                echo "\${{ steps.get-files.outputs.files }} is empty"
+          else
+                echo "\"${{ steps.get-files.outputs.files }}" is NOT empty"
+                python3 publish_workbook.py --project_name "Technology" --password ${{env.PASS}} --workbook_files "${{ steps.get-files.outputs.files }}"
+          fi
+          
