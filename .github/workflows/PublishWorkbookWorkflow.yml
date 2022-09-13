@@ -28,11 +28,12 @@ jobs:
           python -m pip install --upgrade pip 
           pip install requests
 
-      # - name: Run unit tests
-      #   run: python3 publish_workbook.py --project_name "Technology" --password ${{env.PASS}} --workbook_files "Sales Growth Dashboard.twbx,Sample.twbx"
       - name: Get changed files
         id: get-files
         run: echo ::set-output name=files::$(git diff-tree --no-commit-id --name-only -r $(git rev-parse HEAD) | jq -R -s -c 'split("\n")[:-1]' | jq -r '.[] | (.+",")')
 
       - name: Print files
         run: echo "${{ steps.get-files.outputs.files }}"
+
+      - name: Run unit tests
+        run: python3 publish_workbook.py --project_name "Technology" --password ${{env.PASS}} --workbook_files "${{ steps.get-files.outputs.files }}"

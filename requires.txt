@@ -1,9 +1,0 @@
-defusedxml>=0.7.1
-requests<3.0,>=2.11
-
-[test]
-black
-mock
-mypy>=0.920
-pytest
-requests-mock<2.0,>=1.0
