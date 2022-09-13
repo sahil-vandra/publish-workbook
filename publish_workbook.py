@@ -208,7 +208,7 @@ def main(args):
     print("\nargs ::", args.project_name)
     print("\nworkbook_files ::", args.workbook_files)
     
-    workbook_file_list = args.workbook_files.split(", ")
+    workbook_file_list = args.workbook_files.split(" ,")
     # workbook_file_path_list = args.workbook_files.split(",")
     # workbook_file_list = []
     # for i in workbook_file_path_list:
