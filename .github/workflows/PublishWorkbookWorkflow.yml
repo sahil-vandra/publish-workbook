@@ -30,5 +30,4 @@ jobs:
       #   run: python3 publish_workbook.py --project_name "Technology" --password ${{env.PASS}} --workbook_files "Sales Growth Dashboard.twbx,Sample.twbx"
       - name: Install dependencies
         run: |
-          OUTPUT=$(git diff-tree --no-commit-id --name-only -r $(git rev-parse HEAD) | jq -R -s -c 'split("\n")[:-1]' | jq -r '.[] | (.+",")')
-          echo "$OUTPUT"
+          echo ::set-output name=changedfiles::$(git diff-tree --no-commit-id --name-only -r $(git rev-parse HEAD) | jq -R -s -c 'split("\n")[:-1]' | jq -r '.[] | (.+",")')
