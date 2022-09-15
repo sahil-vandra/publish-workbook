@@ -9,7 +9,7 @@ from requests.packages.urllib3.filepost import encode_multipart_formdata
 
 xmlns = {'t': 'http://tableau.com/api'}
 FILESIZE_LIMIT = 1024 * 1024 * 64   # 64MB
-CHUNK_SIZE = 1024 * 1024 * 5    # 5MB
+CHUNK_SIZE = 1024 * 1024 * 25    # 5MB
 
 
 class ApiCallError(Exception):
@@ -101,7 +101,7 @@ def start_upload_session(server, auth_token, site_id):
     return xml_response.find('t:fileUpload', namespaces=xmlns).get('uploadSessionId')
 
 
-def get_default_project_id(server, auth_token, site_id, project_name):
+def get_project_id(server, auth_token, site_id, project_name):
     page_num, page_size = 1, 100  # Default paginating values
 
     # Builds the request
@@ -145,7 +145,7 @@ def main(args):
         a = i.strip()
         if len(a) > 0:
             workbook_file_list.append(a)
-
+    print("\nworkbook_file_list::", workbook_file_list)
 
     ##### STEP 1: SIGN IN #####
     print("\n1. Signing in as " + args.username)
@@ -153,7 +153,7 @@ def main(args):
 
     ##### STEP 2: OBTAIN PROJECT ID #####
     print("\n2. Finding project to publish")
-    project_id = get_default_project_id(
+    project_id = get_project_id(
         server, auth_token, site_id, args.project_name)
     print("\nproject_id ::", project_id)
 
@@ -162,7 +162,7 @@ def main(args):
         print("\nworkbook_file ::", workbook_file)
 
         print(
-            "\n*Publishing '{0}' to the default project as {1}*".format(workbook_file, args.username))
+            "\n*Publishing '{0}' to the project as {1}*".format(workbook_file, args.username))
 
         # Break workbook file by name and extension
         workbook_filename, file_extension = workbook_file.split('.', 1)
@@ -174,8 +174,8 @@ def main(args):
         # Get workbook size to check if chunking is necessary
         workbook_size = os.path.getsize(workbook_file)
         print("\nworkbook_size:", workbook_size)
-        chunked = workbook_size >= 64
-        print("\nchunked :", chunked) 
+        chunked = workbook_size >= FILESIZE_LIMIT
+        print("\nchunked :", chunked)
         ##### STEP 3: PUBLISH WORKBOOK ######
         # Build a general request for publishing
         xml_request = ET.Element('tsRequest')
