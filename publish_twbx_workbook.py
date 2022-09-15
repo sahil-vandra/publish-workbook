@@ -175,7 +175,7 @@ def main(args):
         workbook_size = os.path.getsize(workbook_file)
         print("\nworkbook_size:", workbook_size)
         # chunked = workbook_size >= FILESIZE_LIMIT
-        if workbook_size >= 67108864 :
+        if workbook_size >= 66 :
             chunked = True
         else: chunked = False
         print("\nchunked :", chunked)
