@@ -1,4 +1,4 @@
-name: PublishWorkbook
+name: PublishTWBXWorkbook
 on:
   push:
     branches: [main]
@@ -6,6 +6,8 @@ on:
 env:
   UNAME: ${{secrets.USERNAME}}
   PASS: ${{secrets.PASSWORD}}
+  PROJ: ${{secrets.PROJECTNAME}}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,15 +32,15 @@ jobs:
 
       - name: Get changed files
         id: get-files
-        run: echo ::set-output name=files::$(git diff-tree --no-commit-id --diff-filter=A --name-only -r $(git rev-parse HEAD) -- *.twbx | jq -R -s -c 'split("\n")[:-1]' | jq -r '.[] | (","+.)')
+        run: echo ::set-output name=files::$(git diff-tree --no-commit-id --diff-filter=AM --name-only -r $(git rev-parse HEAD) -- *.twbx | jq -R -s -c 'split("\n")[:-1]' | jq -r '.[] | (","+.)')
 
       - name: Print files
         run: echo "${{ steps.get-files.outputs.files }}"
 
-      - name: Run unit tests
+      - name: Publish Workbook
         run: |
           if [ ! "${{ steps.get-files.outputs.files }}" ];then
                 echo "TWBX file list is Empty."
           else
-                python3 publish_workbook.py --project_name "Technology" --password ${{env.PASS}} --workbook_files "${{ steps.get-files.outputs.files }}"
+                python3 publish_workbook.py --project_name ${{env.PROJ}} --password ${{env.PASS}} --username ${{env.UNAME}} --workbook_files "${{ steps.get-files.outputs.files }}"
           fi

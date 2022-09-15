@@ -4,18 +4,11 @@ import xml.etree.ElementTree as ET
 import os
 import math
 
-# The following packages are used to build a multi-part/mixed request.
-# They are contained in the 'requests' library
 from requests.packages.urllib3.fields import RequestField
 from requests.packages.urllib3.filepost import encode_multipart_formdata
 
-# The namespace for the REST API is 'http://tableausoftware.com/api' for Tableau Server 9.0
-# or 'http://tableau.com/api' for Tableau Server 9.1 or later
 xmlns = {'t': 'http://tableau.com/api'}
-
-# The maximum size of a file that can be published in a single request is 64MB
 FILESIZE_LIMIT = 1024 * 1024 * 64   # 64MB
-# For when a workbook is over 64MB, break it into 5MB(standard chunk size) chunks
 CHUNK_SIZE = 1024 * 1024 * 5    # 5MB
 
 
@@ -28,27 +21,10 @@ class UserDefinedFieldError(Exception):
 
 
 def _encode_for_display(text):
-    """
-    Encodes strings so they can display as ASCII in a Windows terminal window.
-    This function also encodes strings for processing by xml.etree.ElementTree functions. 
-
-    Returns an ASCII-encoded version of the text.
-    Unicode characters are converted to ASCII placeholders (for example, "?").
-    """
     return text.encode('ascii', errors="backslashreplace").decode('utf-8')
 
 
 def _make_multipart(parts):
-    """
-    Creates one "chunk" for a multi-part upload
-
-    'parts' is a dictionary that provides key-value pairs of the format name: (filename, body, content_type).
-
-    Returns the post body and the content type string.
-
-    For more information, see this post:
-        http://stackoverflow.com/questions/26299889/how-to-post-multipart-list-of-json-xml-files-using-python-requests
-    """
     mime_multipart_parts = []
     for name, (filename, blob, content_type) in parts.items():
         multipart_part = RequestField(name=name, data=blob, filename=filename)
@@ -62,13 +38,6 @@ def _make_multipart(parts):
 
 
 def _check_status(server_response, success_code):
-    """
-    Checks the server response for possible errors.
-
-    'server_response'       the response received from the server
-    'success_code'          the expected success code for the response
-    Throws an ApiCallError exception if the API call fails.
-    """
     if server_response.status_code != success_code:
         parsed_response = ET.fromstring(server_response.text)
 
@@ -89,18 +58,6 @@ def _check_status(server_response, success_code):
 
 
 def sign_in(server, username, password, site=""):
-    """
-    Signs in to the server specified with the given credentials
-
-    'server'   specified server address
-    'username' is the name (not ID) of the user to sign in as.
-               Note that most of the functions in this example require that the user
-               have server administrator permissions.
-    'password' is the password for the user.
-    'site'     is the ID (as a string) of the site on the server to sign in to. The
-               default is "", which signs in to the default site.
-    Returns the authentication token and the site ID.
-    """
     url = server + "/api/3.15/auth/signin"
 
     # Builds the request
@@ -128,12 +85,6 @@ def sign_in(server, username, password, site=""):
 
 
 def sign_out(server, auth_token):
-    """
-    Destroys the active session and invalidates authentication token.
-
-    'server'        specified server address
-    'auth_token'    authentication token that grants user access to API calls
-    """
     url = server + "/api/3.15/auth/signout"
     server_response = requests.post(
         url, headers={'x-tableau-auth': auth_token})
@@ -142,14 +93,6 @@ def sign_out(server, auth_token):
 
 
 def start_upload_session(server, auth_token, site_id):
-    """
-    Creates a POST request that initiates a file upload session.
-
-    'server'        specified server address
-    'auth_token'    authentication token that grants user access to API calls
-    'site_id'       ID of the site that the user is signed into
-    Returns a session ID that is used by subsequent functions to identify the upload session.
-    """
     url = server + "/api/3.15/sites/{0}/fileUploads".format(site_id)
     server_response = requests.post(
         url, headers={'x-tableau-auth': auth_token})
@@ -159,13 +102,6 @@ def start_upload_session(server, auth_token, site_id):
 
 
 def get_default_project_id(server, auth_token, site_id, project_name):
-    """
-    Returns the project ID for the 'default' project on the Tableau server.
-
-    'server'        specified server address
-    'auth_token'    authentication token that grants user access to API calls
-    'site_id'       ID of the site that the user is signed into
-    """
     page_num, page_size = 1, 100  # Default paginating values
 
     # Builds the request
@@ -193,11 +129,8 @@ def get_default_project_id(server, auth_token, site_id, project_name):
         xml_response = ET.fromstring(_encode_for_display(server_response.text))
         projects.extend(xml_response.findall('.//t:project', namespaces=xmlns))
 
-    # Look through all projects to find the 'default' one
-    # default project_id :: 1bb7430e-1e3d-11ed-9347-dfa4b1a97f16
-    # If you want get another project then put here another project name
+    # Look through all projects to find the mensioned project id
     for project in projects:
-        # if project.get('name') == 'default' or project.get('name') == 'Default':
         if project.get('name') == project_name:
             return project.get('id')
     raise LookupError("Project named was not found on server")
@@ -205,48 +138,31 @@ def get_default_project_id(server, auth_token, site_id, project_name):
 
 def main(args):
     workbook_file_list = []
-    project_name = args.project_name
-    print("\nargs ::", args.project_name)
-    print("\nworkbook_files ::", args.workbook_files)
-    
+    server = 'https://tableau.devinvh.com'
+
     temp_workbook_file_list = args.workbook_files.split(",")
     for i in temp_workbook_file_list:
-        a=i.strip()
-        if len(a)>0 :
+        a = i.strip()
+        if len(a) > 0:
             workbook_file_list.append(a)
-    print("\ntemp_list1 ::", workbook_file_list)
-            
-    # workbook_file_path_list = args.workbook_files.split(",")
-    # workbook_file_list = []
-    # for i in workbook_file_path_list:
-    #     workbook_file_list.append(i.rsplit('/', 1)[1])
-    # print('\ntemp_list ::', workbook_file_path_list)
 
-    ##### STEP 0: INITIALIZATION #####
-    server = 'https://tableau.devinvh.com'
-    username = 'Nirav.Padia'
-    password = args.password
 
     ##### STEP 1: SIGN IN #####
-    print("\n1. Signing in as " + username)
-    auth_token, site_id = sign_in(server, username, password)
+    print("\n1. Signing in as " + args.username)
+    auth_token, site_id = sign_in(server, args.username, args.password)
 
     ##### STEP 2: OBTAIN PROJECT ID #####
     print("\n2. Finding project to publish")
-    project_id = get_default_project_id(server, auth_token, site_id, project_name)
+    project_id = get_default_project_id(
+        server, auth_token, site_id, args.project_name)
     print("\nproject_id ::", project_id)
 
     # for workbook_file_path,  workbook_file in zip(workbook_file_path_list, workbook_file_list):
     for workbook_file in workbook_file_list:
-        # print("\nworkbook_file_path ::", workbook_file_path)
         print("\nworkbook_file ::", workbook_file)
 
         print(
-            "\n*Publishing '{0}' to the default project as {1}*".format(workbook_file, username))
-
-        # if not os.path.isfile(workbook_file_path):
-        #     error = "{0}: file not found".format(workbook_file_path)
-        #     raise IOError(error)
+            "\n*Publishing '{0}' to the default project as {1}*".format(workbook_file, args.username))
 
         # Break workbook file by name and extension
         workbook_filename, file_extension = workbook_file.split('.', 1)
@@ -256,10 +172,8 @@ def main(args):
             raise UserDefinedFieldError(error)
 
         # Get workbook size to check if chunking is necessary
-        # workbook_size = os.path.getsize(workbook_file_path)
         workbook_size = os.path.getsize(workbook_file)
         chunked = workbook_size >= FILESIZE_LIMIT
-        # print("\nIs chunked??? ::", chunked)
 
         ##### STEP 3: PUBLISH WORKBOOK ######
         # Build a general request for publishing
@@ -270,7 +184,6 @@ def main(args):
         xml_request = ET.tostring(xml_request)
 
         if chunked:
-            # print("\nIn is chunked if condition...")
             print("\n3. Publishing '{0}' in {1}MB chunks (workbook over 64MB)".format(
                 workbook_file, CHUNK_SIZE / 1024000))
             # Initiates an upload session
@@ -281,7 +194,6 @@ def main(args):
                 "/api/3.15/sites/{0}/fileUploads/{1}".format(site_id, uploadID)
 
             # Read the contents of the file in chunks of 100KB
-            # with open(workbook_file_path, 'rb') as f:
             with open(workbook_file, 'rb') as f:
                 while True:
                     data = f.read(CHUNK_SIZE)
@@ -305,12 +217,10 @@ def main(args):
             publish_url += "&workbookType={0}&overwrite=true".format(
                 file_extension)
         else:
-            # print("\nIn is not chunked else condition...")
             print("\n3. Publishing '" + workbook_file +
                   "' using the all-in-one method (workbook under 64MB)")
 
             # Read the contents of the file to publish
-            # with open(workbook_file_path, 'rb') as f:
             with open(workbook_file, 'rb') as f:
                 workbook_bytes = f.read()
 
@@ -344,9 +254,8 @@ if __name__ == '__main__':
                         type=str, required=True)
     parser.add_argument('--password', action='store',
                         type=str, required=True)
+    parser.add_argument('--username', action='store',
+                        type=str, required=True)
     args = parser.parse_args()
 
     main(args)
-
-
-# python3 publish_workbook.py --project_name "Technology" --password 'pass' --workbook_files "/home/dev1003/twbx_files/Sales Growth Dashboard.twbx,/home/dev1003/twbx_files/InsideAirbnb.twbx,/home/dev1003/twbx_files/Sample.twbx" 
