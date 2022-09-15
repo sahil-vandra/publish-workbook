@@ -174,11 +174,8 @@ def main(args):
         # Get workbook size to check if chunking is necessary
         workbook_size = os.path.getsize(workbook_file)
         print("\nworkbook_size:", workbook_size)
-        # chunked = workbook_size >= FILESIZE_LIMIT
-        if workbook_size >= 66 :
-            chunked = True
-        else: chunked = False
-        print("\nchunked :", chunked)
+        chunked = workbook_size >= FILESIZE_LIMIT
+        
         ##### STEP 3: PUBLISH WORKBOOK ######
         # Build a general request for publishing
         xml_request = ET.Element('tsRequest')
@@ -187,6 +184,7 @@ def main(args):
         ET.SubElement(workbook_element, 'project', id=project_id)
         xml_request = ET.tostring(xml_request)
 
+        print("\nchunked :", chunked)
         if chunked:
             print("\n3. Publishing '{0}' in {1}MB chunks (workbook over 64MB)".format(
                 workbook_file, CHUNK_SIZE / 1024000))
