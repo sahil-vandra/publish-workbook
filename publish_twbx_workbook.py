@@ -9,7 +9,7 @@ from requests.packages.urllib3.filepost import encode_multipart_formdata
 
 xmlns = {'t': 'http://tableau.com/api'}
 FILESIZE_LIMIT = 1024 * 1024 * 64   # 64MB
-CHUNK_SIZE = 1024 * 1024 * 25    # 5MB
+CHUNK_SIZE = 1024 * 1024 * 20    # 20MB
 
 
 class ApiCallError(Exception):
@@ -174,7 +174,10 @@ def main(args):
         # Get workbook size to check if chunking is necessary
         workbook_size = os.path.getsize(workbook_file)
         print("\nworkbook_size:", workbook_size)
-        chunked = workbook_size >= FILESIZE_LIMIT
+        # chunked = workbook_size >= FILESIZE_LIMIT
+        if workbook_size >= 67108864 :
+            chunked = True
+        else: chunked = False
         print("\nchunked :", chunked)
         ##### STEP 3: PUBLISH WORKBOOK ######
         # Build a general request for publishing
