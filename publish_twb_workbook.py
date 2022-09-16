@@ -4,6 +4,7 @@ import tableauserverclient as TSC
 
 
 def main(args):
+    print('\nfilepath::', args.filepath)
     logging.basicConfig(level=40)
     
     # Step 1: Sign in to server.

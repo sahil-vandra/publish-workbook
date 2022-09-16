@@ -175,7 +175,7 @@ def main(args):
         workbook_size = os.path.getsize(workbook_file)
         print("\nworkbook_size:", workbook_size)
         chunked = workbook_size >= FILESIZE_LIMIT
-        
+
         ##### STEP 3: PUBLISH WORKBOOK ######
         # Build a general request for publishing
         xml_request = ET.Element('tsRequest')

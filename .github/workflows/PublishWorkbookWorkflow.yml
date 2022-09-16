@@ -12,7 +12,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      changedfiles: ${{ steps.get-files.outputs.files }}
+      changed_twbx_files: ${{ steps.get-files.outputs.files }}
+      changed_twb_files: ${{ steps.get-twb-files.outputs.twb_files }}
 
     steps:
       - name: Checkout
@@ -30,17 +31,34 @@ jobs:
           python -m pip install --upgrade pip 
           pip install requests
 
-      - name: Get changed files
+      # For TWBX file
+      - name: Get changed twbx files
         id: get-files
         run: echo ::set-output name=files::$(git diff-tree --no-commit-id --diff-filter=AM --name-only -r $(git rev-parse HEAD) -- *.twbx | jq -R -s -c 'split("\n")[:-1]' | jq -r '.[] | (","+.)')
 
       - name: Print files
         run: echo "${{ steps.get-files.outputs.files }}"
 
-      - name: Publish Workbook
+      - name: Publish twbx Workbook
         run: |
           if [ ! "${{ steps.get-files.outputs.files }}" ];then
                 echo "TWBX file list is Empty."
           else
                 python3 publish_twbx_workbook.py --project_name ${{env.PROJ}} --password ${{env.PASS}} --username ${{env.UNAME}} --workbook_files "${{ steps.get-files.outputs.files }}"
+          fi
+        
+      # For TWB file
+      - name: Get changed twb files
+        id: get-twb-files
+        run: echo ::set-output name=twb_files::$(git diff-tree --no-commit-id --diff-filter=AM --name-only -r $(git rev-parse HEAD) -- *.twb | jq -R -s -c 'split("\n")[:-1]' | jq -r '.[] | (","+.)')
+
+      - name: Print files
+        run: echo ${{ steps.get-twb-files.outputs.twb_files }}
+
+      - name: Publish twb Workbook
+        run: |
+          if [ ! ${{ steps.get-twb-files.outputs.twb_files }} ];then
+                echo "TWB file list is Empty."
+          else
+                python3 publish_twb_workbook.py --project_name ${{env.PROJ}} --password ${{env.PASS}} --username ${{env.UNAME}} --filepath "${{ steps.get-files.outputs.files }}"
           fi
