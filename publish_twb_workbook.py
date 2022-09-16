@@ -6,7 +6,7 @@ import tableauserverclient as TSC
 
 def main(args):
     logging.basicConfig(level=40)
-    print('\nfilepath::', args.workbook_files) # ",Sample - Superstore.twb ,Sample.twb"
+    print('\nfilepath::', args.workbook_files)
     workbook_file_list = []
 
     temp_workbook_file_list = args.workbook_files.split(",")

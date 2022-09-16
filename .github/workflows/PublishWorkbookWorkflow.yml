@@ -47,7 +47,7 @@ jobs:
           else
                 python3 publish_twbx_workbook.py --project_name ${{env.PROJ}} --password ${{env.PASS}} --username ${{env.UNAME}} --workbook_files "${{ steps.get-files.outputs.files }}"
           fi
-        
+
       # For TWB file
       - name: Get changed twb files
         id: get-twb-files
