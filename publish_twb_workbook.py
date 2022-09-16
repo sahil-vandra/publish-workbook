@@ -14,27 +14,28 @@ def main(args):
         if len(a) > 0:
             workbook_file_list.append(a)
     print("\nworkbook_file_list::", workbook_file_list)
-    
-    # Step 1: Sign in to server.
-    tableau_auth = TSC.TableauAuth(args.username, args.password)
-    server = TSC.Server('https://tableau.devinvh.com/')
-    overwrite_true = TSC.Server.PublishMode.Overwrite
+    if len(workbook_file_list) > 0:
+        # Step 1: Sign in to server.
+        tableau_auth = TSC.TableauAuth(args.username, args.password)
+        server = TSC.Server('https://tableau.devinvh.com/')
+        overwrite_true = TSC.Server.PublishMode.Overwrite
 
-    with server.auth.sign_in(tableau_auth):
-        # Step 2: Get all the projects on server, then look for the default one.
-        all_projects, pagination_item = server.projects.get()
-        project = next(
-            (project for project in all_projects if project.name == args.project_name), None)
-        # Step 3: If default project is found, form a new workbook item and publish.
-        if project is not None:
-            for file in workbook_file_list:
-                new_workbook = TSC.WorkbookItem(project.id)
-                new_workbook = server.workbooks.publish(
-                    new_workbook, file, overwrite_true)
-                print("Workbook published.")
-        else:
-            error = "The project could not be found."
-            raise LookupError(error)
+        with server.auth.sign_in(tableau_auth):
+            # Step 2: Get all the projects on server, then look for the default one.
+            all_projects, pagination_item = server.projects.get()
+            project = next(
+                (project for project in all_projects if project.name == args.project_name), None)
+            # Step 3: If default project is found, form a new workbook item and publish.
+            if project is not None:
+                for file in workbook_file_list:
+                    new_workbook = TSC.WorkbookItem(project.id)
+                    new_workbook = server.workbooks.publish(
+                        new_workbook, file, overwrite_true)
+                    print("Workbook published.")
+            else:
+                error = "The project could not be found."
+                raise LookupError(error)
+    else: print("Workbook list is null")
 
 
 if __name__ == '__main__':
