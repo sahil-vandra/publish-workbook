@@ -42,13 +42,13 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     
-    parser.add_argument(
-        '--username', help='username to sign into server')
-    parser.add_argument(
-        '--password', help='filepath to the workbook to publish')
-    parser.add_argument('--filepath',"-u", help='filepath to the workbook to publish', action="store_true")
     parser.add_argument('--project_name', action='store',
                         type=str)
+    parser.add_argument(
+        '--password', help='filepath to the workbook to publish')
+    parser.add_argument(
+        '--username', help='username to sign into server')
+    parser.add_argument('--filepath', help='filepath to the workbook to publish')
 
     args = parser.parse_args()
     main(args)
