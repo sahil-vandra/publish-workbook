@@ -43,10 +43,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     
     parser.add_argument(
-        '--username', '-u', help='username to sign into server')
+        '--username', help='username to sign into server')
     parser.add_argument(
-        '--password', '-f', help='filepath to the workbook to publish')
-    parser.add_argument('--filepath', help='filepath to the workbook to publish', type=str, action='store_true')
+        '--password', help='filepath to the workbook to publish')
+    parser.add_argument('--filepath', help='filepath to the workbook to publish', type=str, action='store')
     parser.add_argument('--project_name', action='store',
                         type=str)
 
