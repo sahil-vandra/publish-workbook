@@ -4,8 +4,16 @@ import tableauserverclient as TSC
 
 
 def main(args):
-    print('\nfilepath::', args.filepath)
     logging.basicConfig(level=40)
+    print('\nfilepath::', args.filepath) # ",Sample - Superstore.twb ,Sample.twb"
+    workbook_file_list = []
+
+    temp_workbook_file_list = args.filepath.split(",")
+    for i in temp_workbook_file_list:
+        a = i.strip()
+        if len(a) > 0:
+            workbook_file_list.append(a)
+    print("\nworkbook_file_list::", workbook_file_list)
     
     # Step 1: Sign in to server.
     tableau_auth = TSC.TableauAuth(args.username, args.password)
@@ -19,10 +27,11 @@ def main(args):
             (project for project in all_projects if project.name == args.project_name), None)
         # Step 3: If default project is found, form a new workbook item and publish.
         if project is not None:
-            new_workbook = TSC.WorkbookItem(project.id)
-            new_workbook = server.workbooks.publish(
-                new_workbook, args.filepath, overwrite_true)
-            print("Workbook published.")
+            for file in workbook_file_list:
+                new_workbook = TSC.WorkbookItem(project.id)
+                new_workbook = server.workbooks.publish(
+                    new_workbook, file, overwrite_true)
+                print("Workbook published.")
         else:
             error = "The project could not be found."
             raise LookupError(error)
