@@ -58,8 +58,9 @@ jobs:
 
       - name: Publish twb Workbook
         run: |
-          if [ ! ${{ steps.get-twb-files.outputs.twb_files }} ];then
-                echo "TWB file list is Empty."
-          else
-                python3 publish_twb_workbook.py --project_name ${{env.PROJ}} --password ${{env.PASS}} --username ${{env.UNAME}} --filepath "${{ steps.get-files.outputs.files }}"
-          fi
+          python3 publish_twb_workbook.py --project_name ${{env.PROJ}} --password ${{env.PASS}} --username ${{env.UNAME}} --filepath "${{ steps.get-files.outputs.files }}"
+        # if [ ! ${{ steps.get-twb-files.outputs.twb_files }} ];then
+        #       echo "TWB file list is Empty."
+        # else
+        #       python3 publish_twb_workbook.py --project_name ${{env.PROJ}} --password ${{env.PASS}} --username ${{env.UNAME}} --filepath "${{ steps.get-files.outputs.files }}"
+        # fi
