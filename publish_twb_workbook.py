@@ -14,6 +14,7 @@ def main(args):
         if len(a) > 0:
             workbook_file_list.append(a)
     print("\nworkbook_file_list::", workbook_file_list)
+    
     if len(workbook_file_list) > 0:
         # Step 1: Sign in to server.
         tableau_auth = TSC.TableauAuth(args.username, args.password)
@@ -42,13 +43,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     
     parser.add_argument(
-        '--username', '-u', help='username to sign into server', default='Nirav.Padia')
+        '--username', '-u', help='username to sign into server')
     parser.add_argument(
-        '--password', '-f', help='filepath to the workbook to publish', default='Password1')
-    parser.add_argument('--filepath', help='filepath to the workbook to publish',
-                        default='/home/dev1003/OneDrive/sahilvandra.softvan@gmail.com/IH/publish twb and twbx workbook using python rest api/Sample - Superstore.twb')
+        '--password', '-f', help='filepath to the workbook to publish')
+    parser.add_argument('--filepath', help='filepath to the workbook to publish', type=str, action='store_true')
     parser.add_argument('--project_name', action='store',
-                        type=str, default="Technology")
+                        type=str)
 
     args = parser.parse_args()
     main(args)
