@@ -61,5 +61,5 @@ jobs:
           if [ ! ${{ steps.get-twb-files.outputs.twb_files }} ];then
                 echo "TWB file list is Empty."
           else
-                python3 publish_twb_workbook.py --project_name ${{env.PROJ}} --password ${{env.PASS}} --username ${{env.UNAME}} -w ${{ steps.get-twb-files.outputs.twb_files }}
+                python3 publish_twb_workbook.py --project_name ${{env.PROJ}} --password ${{env.PASS}} --username ${{env.UNAME}} -w "${{ steps.get-twb-files.outputs.twb_files }}"
           fi

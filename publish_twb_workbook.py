@@ -42,8 +42,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(allow_abbrev=False)
-    
-    parser.add_argument('-w','--workbook_files', action='store',
+    parser.add_argument('--workbook_files', action='store',
                         type=str, required=True)
     parser.add_argument('--project_name', action='store',
                         type=str, required=True)
