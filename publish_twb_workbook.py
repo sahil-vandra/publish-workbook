@@ -5,10 +5,10 @@ import tableauserverclient as TSC
 
 def main(args):
     logging.basicConfig(level=40)
-    print('\nfilepath::', args.filepath) # ",Sample - Superstore.twb ,Sample.twb"
+    print('\nfilepath::', args.workbook_files) # ",Sample - Superstore.twb ,Sample.twb"
     workbook_file_list = []
 
-    temp_workbook_file_list = args.filepath.split(",")
+    temp_workbook_file_list = args.workbook_files.split(",")
     for i in temp_workbook_file_list:
         a = i.strip()
         if len(a) > 0:
@@ -40,15 +40,14 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    
+    parser = argparse.ArgumentParser(allow_abbrev=False)
+    parser.add_argument('--workbook_files', action='store',
+                        type=str, required=True)
     parser.add_argument('--project_name', action='store',
-                        type=str)
-    parser.add_argument(
-        '--password', help='filepath to the workbook to publish')
-    parser.add_argument(
-        '--username', help='username to sign into server')
-    parser.add_argument('--filepath', help='filepath to the workbook to publish')
-
+                        type=str, required=True)
+    parser.add_argument('--password', action='store',
+                        type=str, required=True)
+    parser.add_argument('--username', action='store',
+                        type=str, required=True)
     args = parser.parse_args()
     main(args)
