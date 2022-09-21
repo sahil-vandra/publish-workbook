@@ -1,54 +1,47 @@
 import argparse
-import logging
-from tkinter import W
 import tableauserverclient as TSC
 
 
 def main(args):
-    logging.basicConfig(level=40)
-    print('\nfilepath::', args.workbook_files)
-    workbook_file_list = []
+    print('\nworkbooks filepath::', args.workbook_files)
 
-    temp_workbook_file_list = args.workbook_files.split(",")
-    for i in temp_workbook_file_list:
-        a = i.strip()
-        if len(a) > 0:
-            workbook_file_list.append(a)
-    print("\nworkbook_file_list::", workbook_file_list)
-    
-    if len(workbook_file_list) > 0:
+    wb_list = []
+    for wb in args.workbook_files.split(","):
+        temp_wb = wb.strip()
+        if len(temp_wb) > 0:
+            wb_list.append(temp_wb)
+    print("\nwb_list::", wb_list)
+
+    if len(wb_list) > 0:
         # Step 1: Sign in to server.
         tableau_auth = TSC.TableauAuth(args.username, args.password)
-        server = TSC.Server('https://tableau.devinvh.com/')
+        server = TSC.Server(args.server_url)
         overwrite_true = TSC.Server.PublishMode.Overwrite
 
         with server.auth.sign_in(tableau_auth):
-            # Step 2: Get all the projects on server, then look for the default one.
-            all_projects, pagination_item = server.projects.get()
-            project = next(
-                (project for project in all_projects if project.name == args.project_name), None)
-            # Step 3: If default project is found, form a new workbook item and publish.
-            if project is not None:
-                for file in workbook_file_list:
-                    new_workbook = TSC.WorkbookItem(project.id)
-                    new_workbook = server.workbooks.publish(
-                        new_workbook, file, overwrite_true)
-                    print("Workbook published.")
-            else:
-                error = "The project could not be found."
-                raise LookupError(error)
-    else: print("Workbook list is null")
+            # Step 3: New workbook item publish.
+            for wb_file in wb_list:
+                new_workbook = TSC.WorkbookItem(args.project_id)
+                new_workbook = server.workbooks.publish(
+                    new_workbook, wb_file, overwrite_true)
+                print(f"\nWorkbook :: {wb_file} :: published")
+    else:
+        print("Workbook list is null")
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(allow_abbrev=False)
-    parser.add_argument('--workbook_files', action='store',
-                        type=str, required=True)
-    parser.add_argument('--project_name', action='store',
+    parser.add_argument('--username', action='store',
                         type=str, required=True)
     parser.add_argument('--password', action='store',
                         type=str, required=True)
-    parser.add_argument('--username', action='store',
+    parser.add_argument('--server_url', action='store',
+                        type=str, required=True)
+    parser.add_argument('--project_id', action='store',
+                        type=str, required=True)
+    parser.add_argument('--workbook_files', action='store',
                         type=str, required=True)
     args = parser.parse_args()
     main(args)
+
+# python3 publish_twb_workbook.py --username 'Nirav.Padia' --password 'Password1' --server_url 'https://tableau.devinvh.com/' --project_id '40e18c1e-6926-4ca5-bf10-82a8b8d89e27' --workbook_files '/home/dev1003/workbook files/Sample.twb,/home/dev1003/workbook files/Sample - Superstore.twb,/home/dev1003/workbook files/Sample.twbx,/home/dev1003/workbook files/Sales Growth Dashboard.twbx,/home/dev1003/workbook files/InsideAirbnb.twbx'
