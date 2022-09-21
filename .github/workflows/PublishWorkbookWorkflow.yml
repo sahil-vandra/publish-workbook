@@ -6,14 +6,16 @@ on:
 env:
   UNAME: ${{secrets.USERNAME}}
   PASS: ${{secrets.PASSWORD}}
-  PROJ: ${{secrets.PROJECTNAME}}
+  PROJID: ${{secrets.PROJECTID}}
+  SERVURL: ${{secrets.SERVERURL}}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      changed_twbx_files: ${{ steps.get-files.outputs.files }}
-      changed_twb_files: ${{ steps.get-twb-files.outputs.twb_files }}
+      changed_files: ${{ steps.get-files.outputs.files }}
+      # changed_twbx_files: ${{ steps.get-files.outputs.files }}
+      # changed_twb_files: ${{ steps.get-twb-files.outputs.twb_files }}
 
     steps:
       - name: Checkout
@@ -29,37 +31,36 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip 
-          pip install requests
           pip install tableauserverclient
+        # pip install requests
 
-      # For TWBX file
       - name: Get changed twbx files
         id: get-files
-        run: echo ::set-output name=files::$(git diff-tree --no-commit-id --diff-filter=AM --name-only -r $(git rev-parse HEAD) -- *.twbx | jq -R -s -c 'split("\n")[:-1]' | jq -r '.[] | (","+.)')
+        run: echo ::set-output name=files::$(git diff-tree --no-commit-id --diff-filter=AM --name-only -r $(git rev-parse HEAD) -- *.twbx -- *.twb | jq -R -s -c 'split("\n")[:-1]' | jq -r '.[] | (","+.)')
 
-      - name: Print files
-        run: echo "${{ steps.get-files.outputs.files }}"
+      # - name: Print files
+      #   run: echo "${{ steps.get-files.outputs.files }}"
 
       - name: Publish twbx Workbook
         run: |
           if [ ! "${{ steps.get-files.outputs.files }}" ];then
                 echo "TWBX file list is Empty."
           else
-                python3 publish_twbx_workbook.py --project_name ${{env.PROJ}} --password ${{env.PASS}} --username ${{env.UNAME}} --workbook_files "${{ steps.get-files.outputs.files }}"
+                python3 publish_twb_workbook.py --server_url "${{env.SERVURL}}" --project_ID ${{env.PROJID}} --password ${{env.PASS}} --username ${{env.UNAME}} --workbook_files "${{ steps.get-files.outputs.files }}"
           fi
 
       # For TWB file
-      - name: Get changed twb files
-        id: get-twb-files
-        run: echo ::set-output name=twb_files::$(git diff-tree --no-commit-id --diff-filter=AM --name-only -r $(git rev-parse HEAD) -- *.twb | jq -R -s -c 'split("\n")[:-1]' | jq -r '.[] | (","+.)')
+      # - name: Get changed twb files
+      #   id: get-twb-files
+      #   run: echo ::set-output name=twb_files::$(git diff-tree --no-commit-id --diff-filter=AM --name-only -r $(git rev-parse HEAD) -- *.twb | jq -R -s -c 'split("\n")[:-1]' | jq -r '.[] | (","+.)')
 
-      - name: Print files
-        run: echo ${{ steps.get-twb-files.outputs.twb_files }}
+      # - name: Print files
+      #   run: echo ${{ steps.get-twb-files.outputs.twb_files }}
 
-      - name: Publish twb Workbook
-        run: |
-          if [ ! ${{ steps.get-twb-files.outputs.twb_files }} ];then
-                echo "TWB file list is Empty."
-          else
-                python3 publish_twb_workbook.py --project_name ${{env.PROJ}} --password ${{env.PASS}} --username ${{env.UNAME}} --workbook_files "${{ steps.get-twb-files.outputs.twb_files }}"
-          fi
+      # - name: Publish twb Workbook
+      #   run: |
+      #     if [ ! ${{ steps.get-twb-files.outputs.twb_files }} ];then
+      #           echo "TWB file list is Empty."
+      #     else
+      #           python3 publish_twb_workbook.py --project_name ${{env.PROJ}} --password ${{env.PASS}} --username ${{env.UNAME}} --workbook_files "${{ steps.get-twb-files.outputs.twb_files }}"
+      #     fi
